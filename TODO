@@ -1,0 +1,18 @@
+* PDF: Remove empty even-numbererd pages
+	=> From Latex manual: Each \chapter starts on a fresh page, an odd-numbered page if the document is two-sided
+	https://tug.org/texinfohtml/latex2e.html#g_t_005cchapter
+* PDF: Figure out how to split row of a table that doesn't fit in one page (e.g. V36 doc releases)
+	=> Latex doesn't support this, need to insert page breaks or horizontal lines manually.
+* PDF: There is an extra blank text line above and below line-blocks in table cells.
+	This is how latex \list and \itemize works - it adds \par on top and bottom, because it needs to measure space between \items and surrounding environemnt.
+	Doesn't cause any issues in plain text, but table includes these empty lines in a cell.
+	Info (https://tug.org/texinfohtml/latex2e.html#list)
+	All options tried and working in plain text, but impossible to get rid of extra blank lines above and below \list in a table cell.
+	Also info on lists (https://www.overleaf.com/learn/latex/Lists?)
+	Can use /usr/share/texmf-dist/tex/latex/paralist/paralist.sty as a guidance, but will need to create a custom list ourselves to fix this.
+26/10/2022
+
+
+* Nested includes
+* PDF: Green title page?
+26/11/2014

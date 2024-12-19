@@ -1,0 +1,230 @@
+Leandc series XML configuration manual
+
+Project setup:
+
+Install prerequisites:
+	sudo apt-get install python-sphinx	(obsolete)
+	sudo apt-get install python3-sphinx
+	sudo apt-get install texlive-full	(Full not required)
+
+Run the build:
+	make singlehtml			- HTML documentation for customers
+	make singlehtml_internal	- HTML documentation for internal use
+	make latexpdf			- PDF documentation for customers
+	make latexpdf_internal		- PDF documentation for internal use
+
+
+
+Root file is the 'index.rst', which contains all section details.
+In order to add a new section:
+* Add name of the new section in the 'index.rst', e.g. 'sections/ModbusConfiguration'
+* Create a source file for the newly created section in folder 'sections', e.g. 'ModbusConfiguration.rst'
+* The first entry in all source files must be '.. include:: global.roles'. This ensures text formating/highlighting rules are load (tip, warning, etc)
+* Add text following formating rules used in existing sections.
+
+
+Formating rules
+-----------------------------------------------------------------------------------------------
+Headings:
+-----------------------------------------------------------------------------------------------
+
+* Section headings underlined with '='
+  ==========================
+
+* Subsection headings underlined with '-'
+  -------------------------------
+
+* Subsubsection headings underlined with '^'
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Underlined texts enable compiler to generate overall structure of the HTML document.
+
+
+-----------------------------------------------------------------------------------------------
+Reference links:
+-----------------------------------------------------------------------------------------------
+Terminology:
+	reference label	= Sphinx directive that generates a reference target e.g. '.. _xmlelem-ModbusmaAI:'
+	reference target	= Invisible sphinx element that points to a link target
+	link label		= Text shown in the resulting document instead of a link itself. Normally it is generated automatically (can be defined manually, but this should be avoided). (term 'link title' in Sphinx doc)
+	link target		= Target text that is found (and possibly highlighted) when link is clicked.
+
+
+* Standard Sphinx functionality only allows to automatically get a link label from the text below the reference label as follows:
+
+.. _xmlelem-ModbusmaAI: lelabel=AI
+
+AITable group
+-------------
+
+  This reference label can be us as :ref:`xmlelem-ModbusmaAI` and will have a link label 'AITable group'.
+  A link label can be defined manually e.g. :ref:`AI<xmlelem-ModbusmaAI>` which is also a standard Sphinx functionality.
+  Manual definition of link labels must be avoided because it is always advisable to have link labels generated automatically from link targets.
+  For this reason standard Sphinx functionality has been extended by 'lelabel=xxx' which is used to define link labels for reference labels of document sections.
+  The example document section above can be referenced as :ref:`xmlelem-ModbusmaAI` and will have a link label 'AI'.
+
+
+* Reference targets are generated automatically for XML attributes using the following syntax:
+:xmlattr:`Index`
+
+  The reference target is created by concatenating 'xmlelem-xxx' found before :xmlattr: definition and the text inside the :xmlattr:
+  Example:
+
+.. _xmlelem-IEC10xmaDI: lelabel=DI
+
+:xmlattr:`Index`
+
+  This example will generate a reference target that can be used as :ref:`xmlattr-IEC10xmaDIIndex`.
+
+
+* Tables are referenced by their names now (there is no need to put a reference label before a table as before):
+:name: tabid-ModbusAIType
+
+  It is essential to use prefix 'tabid-' because it is used to generate automatic reference targets for bits.
+  Table can be referenced as ':numref:`tabid-ModbusAIType`' and will have a link label 'Table x.x'.
+
+
+* Reference targets are generated automatically for bits (defined in tables) using the following syntax:
+  * :attr:	:bitdef:`9`
+
+  The reference target is created by concatenating 'tabid-xxx' which is the :name: of the parent table and the text inside the :bitdef:
+  Example:
+
+:name: tabid-IEC61850clAcsiDSFlags
+
+  * :attr:	:bitdef:`9`
+
+  This example will generate a reference target that can be used as :ref:`bitref-IEC61850clAcsiDSFlagsBit9` and will have a link label 'Bit[9]'.
+
+
+* Old style of resolving link targets is no longer in use!
+  XML attributes had a reference label before definition:
+.. _ref-IEC10xmaDIIndex:
+
+  and in order to reference the label the folowing syntax was used:
+
+:ref:`<ref-IEC10xmaDIIndex>`
+  Resolving `:ref:<xxx>` targets was taken care by prebuild_sphinx.py preprocessor and relied on finding ".. _ref-" in the refrence label.
+  There is no more code that relies on finding ".. _ref-" or `:ref:<xxx>` (reference without a label followed by angle bracket <).
+
+* Link target definition has the following syntax:
+.. _ref-ModbusConfig:
+
+	Warning!!! Link target definition must be followed by an empty line!!!
+
+
+-----------------------------------------------------------------------------------------------
+Included source files:
+-----------------------------------------------------------------------------------------------
+
+* Include specified file contents in the current file:
+.. include:: ModbusConfig/ProtocolCfg.rst
+
+	Mandatory arguments:
+		'ModbusConfig/ProtocolCfg.rst' 			- Relative path of the file to be included. (root is current file)
+
+
+* Include specified file contents in the current file with optional arguments:
+.. include-file:: sections/Include/XMLSettings.rstinc "internal" ":ref:`XMLSettings<ref-IEC101slXMLSettings>`" ".. _ref-IEC101slXMLSettingsAttributes:"
+
+	Mandatory arguments:
+		'sections/Include/XMLSettings.rstinc' 		- Absolute path of the file to be included. (root is project folder)
+
+	Optional arguments:
+		"internal" 					- Build flags - the file must be included only when building internal documentation
+					 			  Must be left blank "" to always include the file
+		'placeholder value'				- Unlimited number of values to populate numbered placeholders in the file to be included, e.g.
+								  1st value will populate placeholder ":include-arg:`1`" in the file to be included,
+								  2nd value - placeholder ":include-arg:`2`" etc
+
+-----------------------------------------------------------------------------------------------
+Global substitutions:
+-----------------------------------------------------------------------------------------------
+Substitutions can be defined in any source file. Definitions are exclued from the target document.
+
+* Define substitutions as follows:
+.. |name| replace:: replacement *text*
+
+	Use substition anywhere in text e.g. |name| which will be replaced by 'replacement *text*' in the docuement.
+
+-----------------------------------------------------------------------------------------------
+Tables
+-----------------------------------------------------------------------------------------------
+
+Example:
+
+.. field-list-table:: IEC 60807-5-101 Slave ProtocolCfg child element nodes
+   :class: table table-condensed table-bordered longtable
+   :name: tabid-ModbusAIType
+   :spec: |C{0.20}|C{0.25}|S{0.55}|
+   :header-rows: 1
+
+   * :attr,10,center:	Attribute
+     :val,15,center:	Values or range
+     :desc,75:		Description
+
+   * :attr: :xmlattr:`XMLSettings`
+     :val:  See table :numref:`ref-XMLSettingsAttributes`
+     :desc: XML parse setting specification node.
+
+Details:
+
+.. field-list-table:: <name of the table>			<- Name of the table goes here
+
+   :class: table table-condensed table-bordered longtable	<- 'table table-condensed table-bordered' defines HTML layout
+   								   'longtable' used for PDF build and ensures table ????
+
+   :name: tabid-ModbusAIType					<- Creates reference target automatically, use as ':numref:`tabid-ModbusAIType`'
+
+   :spec: |C{0.20}|S{0.25}|E{0.55}|				<- Column width definitions for PDF build
+   			   					   {0.20} column width percentage of the page width
+   		   		  				   C{} column contents are centered
+   		   						   S{} column contents are left-aligned
+   		   						   E{} column contents are right-aligned
+
+   :header-rows: 1						<- Number of rows used for table header
+
+   * :attr,10: Attribute					<- 1st column of the table. Star indicates a new row.
+   								   'attr' name of the column, can be chosen freely
+   								   '10' column width percentage of the HTML width. Needs to specified only it the 1st row.
+   								   'Attribute' contents of the cell
+
+     :val,15:  Values or range					<- 2nd column of the table. 'val' name of the column, can be chosen freely
+     :desc,75: Description					<- 3rd column of the table. 'desc' name of the column, can be chosen freely
+
+   * :attr: :xmlattr:`XMLSettings`				<- 2nd row of the table
+     :val:  See table :numref:`ref-XMLSettingsAttributes`
+     :desc: XML parse setting specification node.
+
+
+-----------------------------------------------------------------------------------------------
+Styles:
+-----------------------------------------------------------------------------------------------
+Styles for HTML defined in SphinxBuild/_static/site.css
+Styles for PDF dedined in SphinxBuild/conf_latex_spx18.py
+
+Roles that also generate references automatically:
+:bitdef:		= could be used for bits in tables, currently no style associated
+:xmlattr:		= for XML attributes
+
+Styles created automatically (e.g. <span class="bitref"> and \DUrole{bitdef}):
+bitref			= used for bit link labels (links to :bitdef: targets)
+docref			= used for document section link labels (links to .. _docref-xxx targets)
+xmlelem		= used for XML element link labels (links to .. _xmlelem-xxx targets)
+xmlgroup		= used for XML group element link labels (links to .. _xmlgroup-xxx targets)
+
+Roles used for styling only:
+:xmlstyle: 		= used to style the enclosed text the same way as ':xmlattr:' and 'xmlelem-' (should be avoided, automatic roles should be used wherever possible)
+:xmllegacy:		= used only in Docreleases.rst file for XML elements/attributes that no longer exist
+:leubold:		= generic bold underline (should be avoided)
+:lemonobgtext:		= used for keywords found in communication standards
+
+
+:xmlref: legacy role is no longer used.
+
+
+-----------------------------------------------------------------------------------------------
+
+'reStructuredText' manual includes syntax details:
+	http://sphinx-doc.org/rest.html#rst-primer
+
